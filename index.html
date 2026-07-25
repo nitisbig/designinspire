@@ -106,6 +106,55 @@ input[type=color]{width:34px;height:28px;border:1px solid #2a2a2a;border-radius:
 .post-hd{display:flex;align-items:center;gap:.5em;margin-bottom:.6em}
 .post-act{display:flex;gap:1.4em;margin-top:.8em;font-size:.85em;color:var(--muted)}
 .post-act span{cursor:pointer}
+
+/* features */
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--gap);padding:var(--pad)}
+.feat{background:var(--surf);border:1px solid var(--line);border-radius:var(--br);padding:calc(var(--pad)*.9);box-shadow:var(--sh);text-align:left}
+.feat-ic{width:2.4em;height:2.4em;border-radius:calc(var(--br)*.6);background:var(--pri);color:var(--onpri);display:flex;align-items:center;justify-content:center;font-size:1.2em;margin-bottom:.8em}
+.feat h3{margin-bottom:.4em}
+
+/* blog */
+.article{max-width:42em;margin:0 auto;padding:calc(var(--pad)*1.6) var(--pad)}
+.article .pill{margin-bottom:1em}
+.article .meta{display:flex;align-items:center;gap:.6em;margin:1.2em 0 1.6em;font-size:.85em;color:var(--muted)}
+.article p{margin-bottom:1.1em}
+.article blockquote{border-left:3px solid var(--pri);padding:.4em 1.2em;margin:1.4em 0;font-style:italic;color:var(--text)}
+.article img.cover{width:100%;height:200px;object-fit:cover;border-radius:var(--br);background:linear-gradient(120deg,var(--pri),var(--acc));display:block;margin-bottom:1.4em}
+
+/* login */
+.auth-wrap{display:flex;align-items:center;justify-content:center;min-height:460px;padding:var(--pad)}
+.auth{width:100%;max-width:360px;background:var(--surf);border:1px solid var(--line);border-radius:var(--br);padding:calc(var(--pad)*1.2);box-shadow:var(--sh);text-align:left}
+.auth h2{text-align:center;margin-bottom:.3em}
+.auth .sub{text-align:center;font-size:.85em;color:var(--muted);margin-bottom:1.4em}
+.field{margin-bottom:.9em}
+.field label{display:block;font-size:.8em;color:var(--muted);margin-bottom:.35em}
+.field .inp{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:calc(var(--br)*.6);padding:.7em .9em;color:var(--text);font-size:.9em}
+.auth .btn{width:100%;margin-top:.5em}
+.auth .alt{text-align:center;font-size:.82em;color:var(--muted);margin-top:1.1em}
+.auth .alt a{color:var(--acc)}
+
+/* testimonials */
+.quotes{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--gap);padding:var(--pad)}
+.quote{background:var(--surf);border:1px solid var(--line);border-radius:var(--br);padding:calc(var(--pad)*.9);box-shadow:var(--sh);text-align:left}
+.quote p{font-size:.95em;margin-bottom:1em}
+.quote .who{display:flex;align-items:center;gap:.6em}
+.logos{display:flex;flex-wrap:wrap;gap:1.6em;justify-content:center;align-items:center;padding:0 var(--pad) calc(var(--pad)*1.4);opacity:.6}
+.logos .logo{font-family:var(--hf);font-weight:var(--hw);font-size:1.1em;color:var(--muted)}
+
+/* gallery */
+.gal-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--gap);padding:var(--pad)}
+.tile{border-radius:var(--br);overflow:hidden;box-shadow:var(--sh);aspect-ratio:1;position:relative;cursor:pointer}
+.tile .art{width:100%;height:100%}
+.tile .cap{position:absolute;left:0;right:0;bottom:0;padding:.7em .9em;background:linear-gradient(transparent,rgba(0,0,0,.55));color:#fff;font-size:.82em;font-family:var(--hf);font-weight:var(--hw)}
+
+/* contact */
+.contact{display:grid;grid-template-columns:1fr 1fr;gap:0;min-height:420px}
+.contact-info{background:var(--surf);padding:calc(var(--pad)*1.4)}
+.contact-info h2{margin-bottom:.5em}
+.contact-info .line{display:flex;align-items:center;gap:.6em;margin-top:1em;font-size:.9em;color:var(--muted)}
+.contact-info .ico{width:2em;height:2em;border-radius:50%;background:var(--pri);color:var(--onpri);display:flex;align-items:center;justify-content:center;font-size:.85em}
+.contact-form{padding:calc(var(--pad)*1.4)}
+.contact-form .btn{width:100%;margin-top:.4em}
 </style>
 </head>
 <body>
@@ -162,6 +211,12 @@ input[type=color]{width:34px;height:28px;border:1px solid #2a2a2a;border-radius:
           <option value="dashboard">Dashboard cards</option>
           <option value="pricing">Pricing table</option>
           <option value="profile">Profile / feed</option>
+          <option value="features">Feature grid</option>
+          <option value="blog">Blog article</option>
+          <option value="login">Login / auth card</option>
+          <option value="testimonials">Testimonials + logos</option>
+          <option value="gallery">Gallery / portfolio</option>
+          <option value="contact">Contact split</option>
         </select>
       </div>
       <div>

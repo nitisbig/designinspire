@@ -121,6 +121,85 @@ const LAYOUTS={
         ${[["Shipped a new design system 🎉","2h"],["Exploring color theory for dark UIs","1d"],["3 layout patterns every SaaS needs","3d"]].map(([t,tm])=>
           `<div class="post"><div class="post-hd"><div class="avatar sm">N</div><b>Nitesh</b><span class="muted">· ${tm}</span></div><p>${t}</p><div class="post-act"><span>♡ 24</span><span>💬 6</span><span>↗ share</span></div></div>`).join("")}
       </div>
+    </div>`,
+  features:()=>`
+    <section class="hero" style="padding-bottom:calc(var(--pad)*.6)">
+      <span class="pill">Why teams choose us</span>
+      <h1>Everything you need, nothing you don't.</h1>
+      <p class="lead">A focused toolkit that keeps your workflow fast and your design consistent.</p>
+    </section>
+    <div class="feat-grid">
+      ${[["⚡","Blazing fast","Instant previews with zero build step so you iterate at the speed of thought."],
+         ["🎨","Design tokens","Every color, font and spacing value flows from a single source of truth."],
+         ["🔒","Secure by default","Your work stays local. No accounts, no tracking, no surprises."],
+         ["📐","Pixel precise","Fine-grained controls for radius, shadow and density down to the pixel."],
+         ["♿","Accessible","Live WCAG contrast checks keep your palettes readable for everyone."],
+         ["📦","Export ready","Copy clean CSS variables straight into your codebase when you're done."]].map(([ic,t,d])=>
+        `<div class="feat"><div class="feat-ic">${ic}</div><h3>${t}</h3><p>${d}</p></div>`).join("")}
+    </div>`,
+  blog:()=>`
+    <article class="article">
+      <span class="pill">Design</span>
+      <h1>Building a design system that actually scales</h1>
+      <div class="meta"><div class="avatar sm">N</div><b>Nitesh Kumar</b><span class="muted">· Jul 25, 2026 · 6 min read</span></div>
+      <div class="cover"></div>
+      <p class="lead">A design system is only as good as the decisions it makes easy. Here's how we cut our component count in half while shipping faster.</p>
+      <p>When we started, every screen reinvented its own spacing, color and type. The result was a product that felt subtly inconsistent everywhere you looked. The fix wasn't more components, it was fewer, sharper primitives.</p>
+      <blockquote>Constraints don't limit creativity, they focus it. A tight token set forces better decisions.</blockquote>
+      <h3>Start with the tokens</h3>
+      <p>Colors, type scale and spacing come first. Once those are locked, components almost design themselves because every value already has a home.</p>
+    </article>`,
+  login:()=>`
+    <div class="auth-wrap">
+      <div class="auth">
+        <h2>Welcome back</h2>
+        <div class="sub">Sign in to your Nimbus account</div>
+        <div class="field"><label>Email</label><div class="inp">you@example.com</div></div>
+        <div class="field"><label>Password</label><div class="inp">••••••••••</div></div>
+        <button class="btn">Sign in</button>
+        <div class="alt">New here? <a>Create an account</a></div>
+      </div>
+    </div>`,
+  testimonials:()=>`
+    <section class="hero" style="padding-bottom:calc(var(--pad)*.6)">
+      <h1>Loved by design teams everywhere.</h1>
+      <p class="lead">Thousands of designers ship better UI with less back-and-forth.</p>
+    </section>
+    <div class="quotes">
+      ${[["This replaced three tools in our workflow. We prototype visual direction in minutes now.","Ava Chen","Design Lead, Northwind"],
+         ["The live contrast checks alone saved us an entire accessibility audit cycle.","Marco Ruiz","PM, Loop"],
+         ["Fonts, color, spacing all in one place. Our handoffs are finally consistent.","Priya Nair","UI Engineer, Vela"]].map(([q,n,r])=>
+        `<div class="quote"><p>"${q}"</p><div class="who"><div class="avatar sm">${n[0]}</div><div><b>${n}</b><br><span class="muted">${r}</span></div></div></div>`).join("")}
+    </div>
+    <div class="logos">${["Northwind","Loop","Vela","Cirrus","Basalt","Quill"].map(l=>`<span class="logo">${l}</span>`).join("")}</div>`,
+  gallery:()=>{
+    const grads=[["--pri","--acc"],["--acc","--pri"],["--pri","--surf"],["--acc","--text"],["--pri","--acc"],["--surf","--acc"]];
+    const names=["Aurora","Drift","Momentum","Prism","Cascade","Ember"];
+    return `
+    <section class="hero" style="padding-bottom:calc(var(--pad)*.6)">
+      <span class="pill">Selected work</span>
+      <h1>Recent projects</h1>
+    </section>
+    <div class="gal-grid">
+      ${grads.map((g,i)=>
+        `<div class="tile"><div class="art" style="background:linear-gradient(135deg,var(${g[0]}),var(${g[1]}))"></div><div class="cap">${names[i]}</div></div>`).join("")}
+    </div>`;
+  },
+  contact:()=>`
+    <div class="contact">
+      <div class="contact-info">
+        <h2>Let's talk</h2>
+        <p class="muted">Have a project in mind? We usually reply within a day.</p>
+        <div class="line"><div class="ico">✉</div>hello@nimbus.design</div>
+        <div class="line"><div class="ico">☎</div>+1 (555) 012-3456</div>
+        <div class="line"><div class="ico">📍</div>San Francisco, CA</div>
+      </div>
+      <div class="contact-form">
+        <div class="field"><label>Name</label><div class="inp">Jane Doe</div></div>
+        <div class="field"><label>Email</label><div class="inp">jane@example.com</div></div>
+        <div class="field"><label>Message</label><div class="inp" style="min-height:5em">Tell us about your project...</div></div>
+        <button class="btn">Send message</button>
+      </div>
     </div>`
 };
 
