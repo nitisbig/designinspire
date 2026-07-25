@@ -118,6 +118,24 @@ input[type=color]{width:34px;height:28px;border:1px solid var(--a-ctrl-border);b
 .theme-toggle .icon-sun{display:block}
 [data-theme="dark"] .theme-toggle .icon-moon{display:block}
 [data-theme="dark"] .theme-toggle .icon-sun{display:none}
+
+/* toolbar export button */
+.toolbar-export{display:flex;align-items:center;gap:6px;padding:0 12px;height:30px;background:linear-gradient(135deg,#6366f1,#7c3aed);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;font-family:inherit;flex:none;box-shadow:0 2px 8px rgba(99,102,241,.35);transition:box-shadow .15s,filter .15s,transform .12s}
+.toolbar-export:hover{box-shadow:0 4px 14px rgba(99,102,241,.5);filter:brightness(1.07);transform:translateY(-1px)}
+.toolbar-export:active{transform:translateY(0)}
+.toolbar-export svg{width:15px;height:15px;flex:none}
+
+/* export modal */
+#exportModal{display:none;position:fixed;inset:0;z-index:200;align-items:flex-start;justify-content:flex-end;padding:52px 16px 0}
+#exportModal.open{display:flex}
+#exportModal .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.35)}
+#exportModal .modal-box{position:relative;z-index:1;width:280px;background:var(--a-sidebar);border:1px solid var(--a-divider-strong);border-radius:10px;box-shadow:0 12px 40px rgba(0,0,0,.35);overflow:hidden}
+#exportModal .modal-hd{padding:12px 16px 10px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--a-heading);background:rgba(99,102,241,.08);border-left:3px solid #6366f1;padding-left:13px;border-bottom:1px solid var(--a-divider);display:flex;justify-content:space-between;align-items:center}
+[data-theme="dark"] #exportModal .modal-hd{background:rgba(99,102,241,.12)}
+#exportModal .modal-close{background:none;border:none;color:var(--a-muted);cursor:pointer;font-size:16px;line-height:1;padding:0 2px;display:flex;align-items:center;justify-content:center}
+#exportModal .modal-close:hover{color:var(--a-heading)}
+#exportModal .modal-bd{padding:12px 16px;display:flex;flex-direction:column;gap:10px}
+
 #backdrop{display:none}
 
 @media (max-width:760px){
@@ -447,6 +465,10 @@ input[type=color]{width:34px;height:28px;border:1px solid var(--a-ctrl-border);b
       </button>
     </div>
     <span class="device-info" id="deviceInfo"></span>
+    <button class="toolbar-export" id="openExport" title="Export design" aria-label="Export design" aria-haspopup="dialog">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+      <span>Export</span>
+    </button>
     <button class="theme-toggle" id="themeToggle" title="Toggle theme" aria-label="Toggle light/dark theme">
       <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
       <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
@@ -458,6 +480,30 @@ input[type=color]{width:34px;height:28px;border:1px solid var(--a-ctrl-border);b
 </div>
 
 <div class="toast" id="toast"></div>
+
+<div id="exportModal" role="dialog" aria-modal="true" aria-label="Export design">
+  <div class="modal-backdrop" id="exportBackdrop"></div>
+  <div class="modal-box">
+    <div class="modal-hd">
+      Export
+      <button class="modal-close" id="closeExport" aria-label="Close export">✕</button>
+    </div>
+    <div class="modal-bd">
+      <span class="lbl">Format</span>
+      <div class="seg" id="expFmtModal">
+        <button data-f="json" class="on">JSON</button>
+        <button data-f="css">CSS</button>
+        <button data-f="tokens">Tokens</button>
+      </div>
+      <div class="action-row">
+        <button id="expCopyModal" class="action-btn solid"><span class="ico">📋</span> Copy</button>
+        <button id="expDownloadModal" class="action-btn outline"><span class="ico">⬇</span> Download</button>
+      </div>
+      <pre class="exp-pre" id="expPreviewModal"></pre>
+      <div class="exp-note">JSON re-imports your full design. CSS drops variables into a stylesheet. Tokens exports a design-token map.</div>
+    </div>
+  </div>
+</div>
 
 <script src="app.js"></script>
 </body>

@@ -486,8 +486,14 @@ function exportFilename(){
 }
 
 function updateExportPreview(){
-  const el=$("expPreview");
-  if(el) el.textContent=exportContent();
+  const c=exportContent();
+  ["expPreview","expPreviewModal"].forEach(id=>{ const el=$(id); if(el) el.textContent=c; });
+}
+
+function syncFmtButtons(){
+  document.querySelectorAll("#expFmt button,#expFmtModal button").forEach(x=>{
+    x.classList.toggle("on",x.dataset.f===expFmt);
+  });
 }
 
 function toast(msg){
@@ -520,16 +526,30 @@ function downloadExport(){
 }
 
 function wireExport(){
-  document.querySelectorAll("#expFmt button").forEach(b=>{
-    b.addEventListener("click",()=>{
-      expFmt=b.dataset.f;
-      document.querySelectorAll("#expFmt button").forEach(x=>x.classList.remove("on"));
-      b.classList.add("on");
-      updateExportPreview();
-    });
+  // sync format buttons across sidebar + modal
+  function setFmt(f){
+    expFmt=f;
+    syncFmtButtons();
+    updateExportPreview();
+  }
+  document.querySelectorAll("#expFmt button,#expFmtModal button").forEach(b=>{
+    b.addEventListener("click",()=>setFmt(b.dataset.f));
   });
   $("expCopy").addEventListener("click",copyExport);
   $("expDownload").addEventListener("click",downloadExport);
+  $("expCopyModal").addEventListener("click",copyExport);
+  $("expDownloadModal").addEventListener("click",downloadExport);
+
+  // modal open/close
+  const modal=$("exportModal");
+  $("openExport").addEventListener("click",()=>{
+    updateExportPreview();
+    modal.classList.add("open");
+  });
+  function closeModal(){ modal.classList.remove("open"); }
+  $("closeExport").addEventListener("click",closeModal);
+  $("exportBackdrop").addEventListener("click",closeModal);
+  document.addEventListener("keydown",e=>{ if(e.key==="Escape") closeModal(); });
 }
 
 // ---- App theme toggle (light/dark chrome — independent of the preview) ----
