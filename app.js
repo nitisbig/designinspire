@@ -47,6 +47,21 @@ function mix(h,pct){const[r,g,b]=hexToRgb(h);const t=pct>0?255:0;const p=Math.ab
 function alpha(h,a){const[r,g,b]=hexToRgb(h);return`rgba(${r},${g},${b},${a})`;}
 function onColor(bg){return lum(bg)>.45?"#0b0b0b":"#ffffff";}
 
+// ---- Compute CSS custom properties from state ----
+function computeVars(){
+  const pad=Math.round(28*S.sp);
+  const gap=Math.round(18*S.sp);
+  return {
+    "--bg":S.bg,"--surf":S.surf,"--text":S.text,"--pri":S.pri,"--acc":S.acc,
+    "--muted":alpha(S.text,.62),"--line":alpha(S.text,.12),
+    "--onpri":onColor(S.pri),"--onacc":onColor(S.acc),
+    "--hf":`'${S.headFont}'`,"--bf":`'${S.bodyFont}'`,
+    "--fs":S.fs+"px","--hw":String(S.hw),"--ls":S.ls+"px",
+    "--br":S.br+"px","--sh":SHADOWS[S.sh],"--pad":pad+"px","--gap":gap+"px",
+    "--ta":S.align
+  };
+}
+
 // ---- Render preview ----
 function render(){
   loadFont(S.headFont); loadFont(S.bodyFont);
@@ -54,21 +69,11 @@ function render(){
   stage.style.maxWidth=S.cw+"px";
   stage.style.margin=S.align==="center"?"0 auto":S.align==="right"?"0 0 0 auto":"0";
 
-  const pad=Math.round(28*S.sp);
-  const gap=Math.round(18*S.sp);
-  const c={
-    "--bg":S.bg,"--surf":S.surf,"--text":S.text,"--pri":S.pri,"--acc":S.acc,
-    "--muted":alpha(S.text,.62),"--line":alpha(S.text,.12),
-    "--onpri":onColor(S.pri),"--onacc":onColor(S.acc),
-    "--hf":`'${S.headFont}'`,"--bf":`'${S.bodyFont}'`,
-    "--fs":S.fs+"px","--hw":S.hw,"--ls":S.ls+"px",
-    "--br":S.br+"px","--sh":SHADOWS[S.sh],"--pad":pad+"px","--gap":gap+"px",
-    "--ta":S.align
-  };
-  const cssVars=Object.entries(c).map(([k,v])=>`${k}:${v}`).join(";");
+  const cssVars=Object.entries(computeVars()).map(([k,v])=>`${k}:${v}`).join(";");
 
   stage.innerHTML=`<div class="frame" style="${cssVars}">${LAYOUTS[S.layout]()}</div>`;
   updateTips();
+  if(document.getElementById("expPreview")) updateExportPreview();
 }
 
 // ---- Layout templates ----
@@ -340,9 +345,107 @@ function wire(){
   });
 }
 
+// ---- Export ----
+let expFmt="json";
+
+function buildJSON(){
+  return JSON.stringify({
+    _tool:"UI Design Sandbox",
+    _schema:1,
+    exportedAt:new Date().toISOString(),
+    typography:{headFont:S.headFont,bodyFont:S.bodyFont,baseSize:S.fs,headingWeight:S.hw,letterSpacing:S.ls},
+    colors:{bg:S.bg,surface:S.surf,text:S.text,primary:S.pri,accent:S.acc},
+    layout:{template:S.layout,align:S.align,radius:S.br,spacing:S.sp,shadow:S.sh,containerWidth:S.cw}
+  },null,2);
+}
+
+function buildCSS(){
+  const v=computeVars();
+  const body=Object.entries(v).map(([k,val])=>`  ${k}: ${val};`).join("\n");
+  const fonts=[...new Set([S.headFont,S.bodyFont])].map(f=>f.replace(/ /g,"+")+":wght@400;500;600;700;800").join("&family=");
+  return `/* UI Design Sandbox — exported ${new Date().toISOString().slice(0,10)} */\n`+
+    `@import url('https://fonts.googleapis.com/css2?family=${fonts}&display=swap');\n\n`+
+    `:root {\n${body}\n}`;
+}
+
+function buildTokens(){
+  return JSON.stringify({
+    color:{
+      background:{value:S.bg},surface:{value:S.surf},text:{value:S.text},
+      primary:{value:S.pri},accent:{value:S.acc},
+      muted:{value:alpha(S.text,.62)},line:{value:alpha(S.text,.12)},
+      "on-primary":{value:onColor(S.pri)},"on-accent":{value:onColor(S.acc)}
+    },
+    font:{heading:{value:S.headFont},body:{value:S.bodyFont}},
+    fontSize:{base:{value:S.fs+"px"}},
+    fontWeight:{heading:{value:S.hw}},
+    letterSpacing:{heading:{value:S.ls+"px"}},
+    radius:{base:{value:S.br+"px"}},
+    spacing:{pad:{value:Math.round(28*S.sp)+"px"},gap:{value:Math.round(18*S.sp)+"px"}},
+    shadow:{base:{value:SHADOWS[S.sh]}}
+  },null,2);
+}
+
+function exportContent(){
+  return expFmt==="css"?buildCSS():expFmt==="tokens"?buildTokens():buildJSON();
+}
+function exportFilename(){
+  const ext=expFmt==="css"?"css":"json";
+  const name=expFmt==="tokens"?"design-tokens":"design";
+  return `${name}.${ext}`;
+}
+
+function updateExportPreview(){
+  const el=$("expPreview");
+  if(el) el.textContent=exportContent();
+}
+
+function toast(msg){
+  const t=$("toast");
+  t.textContent=msg; t.classList.add("show");
+  clearTimeout(toast._t);
+  toast._t=setTimeout(()=>t.classList.remove("show"),1800);
+}
+
+async function copyExport(){
+  const text=exportContent();
+  try{
+    await navigator.clipboard.writeText(text);
+  }catch{
+    const ta=document.createElement("textarea");
+    ta.value=text; document.body.appendChild(ta); ta.select();
+    document.execCommand("copy"); ta.remove();
+  }
+  toast(`Copied ${expFmt.toUpperCase()} to clipboard`);
+}
+
+function downloadExport(){
+  const blob=new Blob([exportContent()],{type:expFmt==="css"?"text/css":"application/json"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url; a.download=exportFilename();
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+  toast(`Downloaded ${exportFilename()}`);
+}
+
+function wireExport(){
+  document.querySelectorAll("#expFmt button").forEach(b=>{
+    b.addEventListener("click",()=>{
+      expFmt=b.dataset.f;
+      document.querySelectorAll("#expFmt button").forEach(x=>x.classList.remove("on"));
+      b.classList.add("on");
+      updateExportPreview();
+    });
+  });
+  $("expCopy").addEventListener("click",copyExport);
+  $("expDownload").addEventListener("click",downloadExport);
+}
+
 // ---- Init ----
-buildPalettes(); buildFonts(); wire();
+buildPalettes(); buildFonts(); wire(); wireExport();
 Object.assign(S,PALETTES[0]);
 syncUI(); render();
+updateExportPreview();
 
 
