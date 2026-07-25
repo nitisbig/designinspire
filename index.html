@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UI Design Sandbox</title>
+<link id="gfont" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{display:flex;height:100vh;font-family:'Inter',system-ui,sans-serif;background:#0d0d0d;color:#e0e0e0;overflow:hidden}
+#sidebar{width:280px;min-width:280px;background:#141414;border-right:1px solid #222;overflow-y:auto;display:flex;flex-direction:column}
+#sidebar-title{padding:14px 16px;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#555;border-bottom:1px solid #222}
+.sec{border-bottom:1px solid #1e1e1e}
+.sec-hd{padding:10px 16px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:#555;cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none;transition:color .15s}
+.sec-hd:hover{color:#999}
+.sec-bd{padding:12px 16px;display:flex;flex-direction:column;gap:10px}
+.sec-bd.hide{display:none}
+.lbl{font-size:11px;color:#666;display:block;margin-bottom:3px}
+select,input[type=text]{width:100%;background:#1e1e1e;border:1px solid #2a2a2a;color:#ddd;padding:6px 8px;border-radius:5px;font-size:12px;outline:none}
+select:focus,input[type=text]:focus{border-color:#444}
+input[type=range]{width:100%;accent-color:#6366f1;cursor:pointer}
+input[type=color]{width:34px;height:28px;border:1px solid #2a2a2a;border-radius:4px;background:none;cursor:pointer;padding:2px}
+.row{display:flex;gap:8px;align-items:center}
+.rv{font-size:11px;color:#555;min-width:30px;text-align:right}
+.btn-g{display:flex;gap:4px}
+.btn-g button{flex:1;padding:5px 4px;background:#1e1e1e;border:1px solid #2a2a2a;color:#888;border-radius:4px;cursor:pointer;font-size:11px;transition:all .15s}
+.btn-g button:hover{background:#252525;color:#ccc}
+.btn-g button.on{background:#6366f1;border-color:#6366f1;color:#fff}
+.pal-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.pal{padding:7px 8px;border-radius:6px;cursor:pointer;border:2px solid transparent;background:#1e1e1e;transition:border-color .15s}
+.pal:hover,.pal.on{border-color:#6366f1}
+.pal-dots{display:flex;gap:3px;margin-bottom:4px}
+.dot{width:13px;height:13px;border-radius:50%}
+.pal-name{font-size:10px;color:#666}
+.color-row{display:flex;gap:8px;align-items:center}
+.color-row span{font-size:11px;color:#666;flex:1}
+#canvas{flex:1;overflow:auto;padding:28px;background:#0d0d0d}
+#stage{min-width:640px;transition:all .2s}
+.preview-lbl{font-size:10px;color:#333;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #1a1a1a}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-thumb{background:#2a2a2a;border-radius:3px}
+
+/* ===== Preview frame ===== */
+.frame{background:var(--bg);color:var(--text);font-family:var(--bf),sans-serif;font-size:var(--fs);border-radius:var(--br);overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.5);text-align:var(--ta)}
+.frame h1,.frame h2,.frame h3,.frame .brand{font-family:var(--hf),sans-serif;font-weight:var(--hw);letter-spacing:var(--ls);line-height:1.1}
+.frame h1{font-size:2.6em;margin-bottom:.4em}
+.frame h2{font-size:1.7em;margin-bottom:.6em}
+.frame h3{font-size:1.25em}
+.frame p{line-height:1.6;color:var(--muted)}
+.frame .lead{font-size:1.12em;max-width:34em}
+.frame .muted{color:var(--muted);font-size:.85em}
+
+.nav{display:flex;justify-content:space-between;align-items:center;padding:calc(var(--pad)*.7) var(--pad);border-bottom:1px solid var(--line)}
+.brand{font-size:1.15em;color:var(--text)}
+.nav-links{display:flex;gap:1.4em;align-items:center;font-size:.9em;color:var(--muted)}
+.nav-links span{cursor:pointer}
+
+.btn{background:var(--pri);color:var(--onpri);border:none;padding:.7em 1.4em;border-radius:calc(var(--br)*.7);font-family:var(--bf);font-size:.95em;font-weight:600;cursor:pointer;box-shadow:var(--sh);transition:transform .1s}
+.btn:hover{transform:translateY(-1px)}
+.btn.ghost{background:transparent;color:var(--text);border:1px solid var(--line);box-shadow:none}
+
+.hero{padding:calc(var(--pad)*2.2) var(--pad)}
+.pill{display:inline-block;background:var(--surf);color:var(--acc);padding:.35em .9em;border-radius:2em;font-size:.78em;font-weight:600;margin-bottom:1.2em;border:1px solid var(--line)}
+.cta{display:flex;gap:.8em;margin-top:1.4em;justify-content:var(--ta)}
+.stats{display:flex;gap:2.4em;margin-top:2.4em;justify-content:var(--ta)}
+.stats b{font-family:var(--hf);font-size:1.7em;display:block;color:var(--text)}
+.stats span{font-size:.8em;color:var(--muted)}
+
+/* dashboard */
+.dash{display:flex;min-height:440px}
+.side{width:180px;background:var(--surf);padding:var(--pad);display:flex;flex-direction:column;gap:.5em}
+.side .brand{margin-bottom:1em}
+.side-i{padding:.6em .8em;border-radius:calc(var(--br)*.6);color:var(--muted);font-size:.9em;cursor:pointer}
+.side-i.act{background:var(--pri);color:var(--onpri)}
+.dash-main{flex:1;padding:var(--pad)}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--gap);margin:1.2em 0}
+.card{background:var(--surf);border:1px solid var(--line);border-radius:var(--br);padding:calc(var(--pad)*.7);box-shadow:var(--sh);text-align:left}
+.card.wide{margin-top:var(--gap)}
+.ct{font-size:.78em;color:var(--muted);display:block}
+.cv{font-family:var(--hf);font-size:1.7em;display:block;margin:.2em 0;color:var(--text)}
+.cd{font-size:.8em;color:var(--acc)}
+.bars{display:flex;align-items:flex-end;gap:.6em;height:120px;margin-top:1em}
+.bars i{flex:1;background:var(--pri);border-radius:calc(var(--br)*.4) calc(var(--br)*.4) 0 0}
+.bars i:nth-child(even){background:var(--acc)}
+
+/* pricing */
+.price-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--gap);padding:var(--pad)}
+.price{background:var(--surf);border:1px solid var(--line);border-radius:var(--br);padding:calc(var(--pad)*1.1);box-shadow:var(--sh);text-align:left;position:relative}
+.price.hot{border-color:var(--pri);border-width:2px}
+.price .pill{position:absolute;top:-.9em;right:1em}
+.amt{font-family:var(--hf);font-size:2.4em;font-weight:var(--hw);margin:.3em 0;color:var(--text)}
+.amt small{font-size:.4em;color:var(--muted)}
+.price ul{list-style:none;margin:1em 0;display:flex;flex-direction:column;gap:.5em}
+.price li{font-size:.9em;color:var(--muted)}
+.price .btn{width:100%;margin-top:.6em}
+
+/* profile */
+.prof{background:var(--surf)}
+.banner{height:120px;background:linear-gradient(120deg,var(--pri),var(--acc))}
+.prof-hd{display:flex;align-items:center;gap:1em;padding:0 var(--pad) var(--pad);margin-top:-32px}
+.avatar{width:72px;height:72px;border-radius:50%;background:var(--pri);color:var(--onpri);display:flex;align-items:center;justify-content:center;font-family:var(--hf);font-size:1.8em;font-weight:var(--hw);border:4px solid var(--surf)}
+.avatar.sm{width:36px;height:36px;font-size:1em;border:none}
+.prof-hd .btn{margin-left:auto}
+.feed{padding:0 var(--pad) var(--pad);display:flex;flex-direction:column;gap:var(--gap)}
+.post{background:var(--bg);border:1px solid var(--line);border-radius:var(--br);padding:calc(var(--pad)*.8);box-shadow:var(--sh);text-align:left}
+.post-hd{display:flex;align-items:center;gap:.5em;margin-bottom:.6em}
+.post-act{display:flex;gap:1.4em;margin-top:.8em;font-size:.85em;color:var(--muted)}
+.post-act span{cursor:pointer}
+</style>
+</head>
+<body>
+<div id="sidebar">
+  <div id="sidebar-title">🎨 UI Design Sandbox</div>
+
+  <div class="sec">
+    <div class="sec-hd" data-t>Typography <span>−</span></div>
+    <div class="sec-bd">
+      <div>
+        <span class="lbl">Heading font</span>
+        <select id="headFont"></select>
+      </div>
+      <div>
+        <span class="lbl">Body font</span>
+        <select id="bodyFont"></select>
+      </div>
+      <div>
+        <span class="lbl">Base size <b class="rv" id="fsV">16px</b></span>
+        <input type="range" id="fs" min="12" max="22" value="16">
+      </div>
+      <div>
+        <span class="lbl">Heading weight <b class="rv" id="hwV">700</b></span>
+        <input type="range" id="hw" min="400" max="800" step="100" value="700">
+      </div>
+      <div>
+        <span class="lbl">Letter spacing <b class="rv" id="lsV">0</b></span>
+        <input type="range" id="ls" min="-2" max="4" step="0.5" value="0">
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-hd" data-t>Colors <span>−</span></div>
+    <div class="sec-bd">
+      <span class="lbl">Presets</span>
+      <div class="pal-grid" id="palettes"></div>
+      <span class="lbl" style="margin-top:6px">Customize</span>
+      <div class="color-row"><input type="color" id="cBg"><span>Background</span></div>
+      <div class="color-row"><input type="color" id="cSurf"><span>Surface</span></div>
+      <div class="color-row"><input type="color" id="cText"><span>Text</span></div>
+      <div class="color-row"><input type="color" id="cPri"><span>Primary</span></div>
+      <div class="color-row"><input type="color" id="cAcc"><span>Accent</span></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-hd" data-t>Layout &amp; Positioning <span>−</span></div>
+    <div class="sec-bd">
+      <div>
+        <span class="lbl">Layout template</span>
+        <select id="layout">
+          <option value="hero">Hero + CTA</option>
+          <option value="dashboard">Dashboard cards</option>
+          <option value="pricing">Pricing table</option>
+          <option value="profile">Profile / feed</option>
+        </select>
+      </div>
+      <div>
+        <span class="lbl">Content align</span>
+        <div class="btn-g" id="align">
+          <button data-v="left" class="on">Left</button>
+          <button data-v="center">Center</button>
+          <button data-v="right">Right</button>
+        </div>
+      </div>
+      <div>
+        <span class="lbl">Corner radius <b class="rv" id="brV">12px</b></span>
+        <input type="range" id="br" min="0" max="28" value="12">
+      </div>
+      <div>
+        <span class="lbl">Spacing density <b class="rv" id="spV">1.0</b></span>
+        <input type="range" id="sp" min="0.6" max="1.8" step="0.1" value="1">
+      </div>
+      <div>
+        <span class="lbl">Shadow depth <b class="rv" id="shV">2</b></span>
+        <input type="range" id="sh" min="0" max="4" value="2">
+      </div>
+      <div>
+        <span class="lbl">Container width <b class="rv" id="cwV">960px</b></span>
+        <input type="range" id="cw" min="560" max="1100" step="20" value="960">
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-hd" data-t>Suggestions <span>−</span></div>
+    <div class="sec-bd">
+      <div class="btn-g"><button id="surprise" style="background:#6366f1;border-color:#6366f1;color:#fff">🎲 Surprise me</button></div>
+      <div id="tips" style="font-size:11px;color:#777;line-height:1.6"></div>
+    </div>
+  </div>
+</div>
+
+<div id="canvas">
+  <div id="stage"></div>
+</div>
+
+<script src="app.js"></script>
+</body>
