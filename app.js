@@ -155,7 +155,6 @@ function render(){
 
   stage.innerHTML=`<div class="frame" style="${cssVars}">${LAYOUTS[S.layout]()}</div>`;
   mountHandles();
-  updateTips();
   if(document.getElementById("expPreview")) updateExportPreview();
 }
 
@@ -290,20 +289,6 @@ const LAYOUTS={
       </div>
     </div>`
 };
-
-// ---- Tips engine ----
-const TIPS_DB = [
-  ()=> contrast(S.text,S.bg)<4.5 ? "⚠️ Text contrast is below 4.5:1 — try a lighter text or darker background." : "✅ Text contrast passes WCAG AA.",
-  ()=> contrast(S.pri,S.bg)<3 ? "⚠️ Primary color is hard to read on your background." : null,
-  ()=>`💡 ${S.headFont} pairs well with ${["Playfair Display","Merriweather","Lora","Fraunces","Libre Baskerville"].includes(S.headFont)?"Inter or DM Sans for body text.":"a serif like Lora or Fraunces for body text."}`,
-  ()=> S.br===0 ? "💡 Zero radius gives a sharp, editorial feel — great for news or finance." : S.br>18 ? "💡 High radius feels friendly and modern — popular in consumer apps." : null,
-  ()=> S.sh===0 ? "💡 Flat design with no shadows works well with bold color palettes." : null,
-  ()=>`💡 Spacing density ${S.sp.toFixed(1)} — ${S.sp<0.8?"tight spacing suits data-dense dashboards.":S.sp>1.4?"generous spacing feels premium and editorial.":"balanced spacing works for most products."}`,
-];
-function updateTips(){
-  const msgs = TIPS_DB.map(f=>f()).filter(Boolean).slice(0,3);
-  $("tips").innerHTML = msgs.join("<br><br>") || "Looking good! Tweak colors or fonts for more suggestions.";
-}
 
 // ---- Surprise me ----
 const SURPRISES = [
