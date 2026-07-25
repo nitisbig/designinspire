@@ -489,8 +489,29 @@ function wireExport(){
   $("expDownload").addEventListener("click",downloadExport);
 }
 
+// ---- App theme toggle (light/dark chrome — independent of the preview) ----
+const THEME_KEY="ui-sandbox-theme";
+function wireTheme(){
+  const btn=$("themeToggle");
+  if(!btn) return;
+  const apply=t=>{
+    if(t==="dark") document.documentElement.setAttribute("data-theme","dark");
+    else document.documentElement.removeAttribute("data-theme");
+    btn.title=t==="dark"?"Switch to light theme":"Switch to dark theme";
+  };
+  let cur;
+  try{ cur=localStorage.getItem(THEME_KEY); }catch(e){}
+  cur = cur==="dark" ? "dark" : "light";   // default light
+  apply(cur);
+  btn.addEventListener("click",()=>{
+    cur = cur==="dark" ? "light" : "dark";
+    apply(cur);
+    try{ localStorage.setItem(THEME_KEY,cur); }catch(e){}
+  });
+}
+
 // ---- Init ----
-buildPalettes(); buildFonts(); wire(); wireExport(); wireDevices();
+buildPalettes(); buildFonts(); wire(); wireExport(); wireDevices(); wireTheme();
 Object.assign(S,PALETTES[0]);
 syncUI(); render();
 updateExportPreview();
