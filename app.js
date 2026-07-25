@@ -70,6 +70,59 @@ function computeVars(){
   };
 }
 
+// ---- Canvas width bounds (shared by slider + drag-resize) ----
+const CW_MIN = 360, CW_MAX = 1400;
+
+// ---- Drag-to-resize handles ----
+// Handles live as children of #stage. render() rewrites stage.innerHTML each
+// time, so we rebuild + remount them after every render (desktop only).
+let handleL, handleR;
+function buildHandles(){
+  const mk = side=>{
+    const h=document.createElement("div");
+    h.className="resize-handle "+side;
+    h.title="Drag to resize canvas";
+    h.innerHTML='<div class="grip"></div>';
+    h.addEventListener("pointerdown",e=>startResize(e,side));
+    return h;
+  };
+  handleL=mk("left"); handleR=mk("right");
+}
+function mountHandles(){
+  // Only meaningful on desktop where width is free to change.
+  if(S.device!=="desktop") return;
+  const stage=$("stage");
+  // Show the handle(s) on the edge(s) that are actually free to move given
+  // the current alignment: left→right edge, right→left edge, center→both.
+  if(S.align==="left"||S.align==="center") stage.appendChild(handleR);
+  if(S.align==="right"||S.align==="center") stage.appendChild(handleL);
+}
+function startResize(e,side){
+  if(S.device!=="desktop") return;
+  e.preventDefault();
+  const stage=$("stage");
+  const startX=e.clientX, startW=S.cw;
+  const mult=S.align==="center"?2:1;      // both edges move when centered
+  const dir=side==="right"?1:-1;
+  stage.classList.add("resizing");
+  try{ e.target.setPointerCapture(e.pointerId); }catch(_){}
+  const move=ev=>{
+    let w=startW + dir*mult*(ev.clientX-startX);
+    w=Math.max(CW_MIN,Math.min(CW_MAX,Math.round(w)));
+    S.cw=w;
+    stage.style.width=w+"px"; stage.style.maxWidth=w+"px";
+    $("cw").value=w; $("cwV").textContent=w+"px";
+  };
+  const up=()=>{
+    stage.classList.remove("resizing");
+    window.removeEventListener("pointermove",move);
+    window.removeEventListener("pointerup",up);
+    render();
+  };
+  window.addEventListener("pointermove",move);
+  window.addEventListener("pointerup",up);
+}
+
 // ---- Render preview ----
 function render(){
   loadFont(S.headFont); loadFont(S.bodyFont);
@@ -83,11 +136,15 @@ function render(){
     // Fixed device viewport: exact width, always centered.
     stage.style.width=dev.w+"px";
     stage.style.maxWidth=dev.w+"px";
+    stage.style.minWidth="";
     stage.style.margin="0 auto";
   }else{
     // Desktop: honor the container-width control and alignment.
-    stage.style.width="";
+    // Set width explicitly (and drop the CSS min-width) so drag-resize can
+    // go below the default 640px floor down to CW_MIN.
+    stage.style.width=S.cw+"px";
     stage.style.maxWidth=S.cw+"px";
+    stage.style.minWidth="0";
     stage.style.margin=S.align==="center"?"0 auto":S.align==="right"?"0 0 0 auto":"0";
   }
 
@@ -97,6 +154,7 @@ function render(){
   const cssVars=Object.entries(computeVars()).map(([k,v])=>`${k}:${v}`).join(";");
 
   stage.innerHTML=`<div class="frame" style="${cssVars}">${LAYOUTS[S.layout]()}</div>`;
+  mountHandles();
   updateTips();
   if(document.getElementById("expPreview")) updateExportPreview();
 }
@@ -511,7 +569,7 @@ function wireTheme(){
 }
 
 // ---- Init ----
-buildPalettes(); buildFonts(); wire(); wireExport(); wireDevices(); wireTheme();
+buildPalettes(); buildFonts(); buildHandles(); wire(); wireExport(); wireDevices(); wireTheme();
 Object.assign(S,PALETTES[0]);
 syncUI(); render();
 updateExportPreview();

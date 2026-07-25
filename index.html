@@ -67,8 +67,16 @@ input[type=color]{width:34px;height:28px;border:1px solid var(--a-ctrl-border);b
 #canvas{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--a-bg);transition:background .2s}
 #toolbar{display:flex;align-items:center;gap:12px;padding:9px 16px;border-bottom:1px solid var(--a-divider);background:var(--a-toolbar);flex:none;transition:background .2s,border-color .2s}
 #stage-scroll{flex:1;overflow:auto;padding:28px}
-#stage{min-width:640px;margin:0 auto;transition:width .25s,max-width .25s}
+#stage{position:relative;min-width:640px;margin:0 auto;transition:width .25s,max-width .25s}
+#stage.resizing{transition:none;user-select:none}
 #stage.dev-tablet,#stage.dev-mobile{min-width:0;border-radius:22px;box-shadow:0 0 0 8px var(--a-device-ring),0 22px 60px rgba(0,0,0,.35)}
+
+/* ===== Canvas edge resize handles (desktop only) ===== */
+.resize-handle{position:absolute;top:0;bottom:0;width:14px;display:flex;align-items:center;justify-content:center;cursor:ew-resize;z-index:6;touch-action:none}
+.resize-handle.left{left:-7px}
+.resize-handle.right{right:-7px}
+.resize-handle .grip{width:4px;height:46px;max-height:55%;border-radius:3px;background:var(--a-ctrl-border);transition:background .15s,height .15s}
+.resize-handle:hover .grip,#stage.resizing .resize-handle .grip{background:#6366f1;height:72px}
 .preview-lbl{font-size:10px;color:var(--a-faint);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--a-divider)}
 ::-webkit-scrollbar{width:5px}
 ::-webkit-scrollbar-thumb{background:var(--a-scroll);border-radius:3px}
@@ -372,7 +380,8 @@ input[type=color]{width:34px;height:28px;border:1px solid var(--a-ctrl-border);b
       </div>
       <div>
         <span class="lbl">Container width <b class="rv" id="cwV">960px</b></span>
-        <input type="range" id="cw" min="560" max="1100" step="20" value="960">
+        <input type="range" id="cw" min="360" max="1400" step="10" value="960">
+        <span class="lbl" style="margin-top:2px;opacity:.75">Tip: drag the canvas edges to resize.</span>
       </div>
     </div>
   </div>
