@@ -228,6 +228,20 @@ const SURPRISES = [
 ];
 let surpriseIdx=0;
 
+function randomHex(){return"#"+Math.floor(Math.random()*0xffffff).toString(16).padStart(6,"0");}
+function mixHex(h,pct){const[r,g,b]=hexToRgb(h);const t=pct>0?255:0;const p=Math.abs(pct);const to=v=>Math.round(v).toString(16).padStart(2,"0");return"#"+to(r+(t-r)*p)+to(g+(t-g)*p)+to(b+(t-b)*p);}
+function randomSurprise(){
+  const hf=FONTS[Math.floor(Math.random()*FONTS.length)];
+  const bf=FONTS[Math.floor(Math.random()*FONTS.length)];
+  const bg=randomHex(),pri=randomHex(),acc=randomHex();
+  const dark=lum(bg)<=.45;
+  const surf=mixHex(bg,dark?.08:-.05);
+  const text=dark?"#f0f0f0":"#0b0b0b";
+  return{headFont:hf,bodyFont:bf,bg,surf,text,pri,acc,
+    br:Math.floor(Math.random()*29),sh:Math.floor(Math.random()*5),
+    sp:Math.round((0.6+Math.random()*1.2)*10)/10};
+}
+
 // ---- Palette grid ----
 function buildPalettes(){
   const g=$("palettes");
@@ -308,6 +322,11 @@ function wire(){
   $("surprise").addEventListener("click",()=>{
     const s=SURPRISES[surpriseIdx++ % SURPRISES.length];
     Object.assign(S,s,PALETTES[s.pal]);
+    syncUI(); render();
+  });
+
+  $("random").addEventListener("click",()=>{
+    Object.assign(S,randomSurprise(),{pal:-1});
     syncUI(); render();
   });
 
