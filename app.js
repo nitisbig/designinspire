@@ -31,7 +31,15 @@ const PALETTES = [
 const S = {
   headFont:"Poppins", bodyFont:"Inter", fs:16, hw:700, ls:0,
   bg:"#0f172a", surf:"#1e293b", text:"#e2e8f0", pri:"#6366f1", acc:"#22d3ee",
-  layout:"hero", align:"left", br:12, sp:1, sh:2, cw:960, pal:0
+  layout:"hero", align:"left", br:12, sp:1, sh:2, cw:960, pal:0,
+  device:"desktop"
+};
+
+// ---- Device presets (viewport widths) ----
+const DEVICES = {
+  desktop:{label:"Desktop", w:null},
+  tablet: {label:"Tablet",  w:768},
+  mobile: {label:"Mobile",  w:390}
 };
 
 const $=id=>document.getElementById(id);
@@ -66,8 +74,25 @@ function computeVars(){
 function render(){
   loadFont(S.headFont); loadFont(S.bodyFont);
   const stage=$("stage");
-  stage.style.maxWidth=S.cw+"px";
-  stage.style.margin=S.align==="center"?"0 auto":S.align==="right"?"0 0 0 auto":"0";
+  const dev=DEVICES[S.device];
+
+  stage.classList.remove("dev-desktop","dev-tablet","dev-mobile");
+  stage.classList.add("dev-"+S.device);
+
+  if(dev.w){
+    // Fixed device viewport: exact width, always centered.
+    stage.style.width=dev.w+"px";
+    stage.style.maxWidth=dev.w+"px";
+    stage.style.margin="0 auto";
+  }else{
+    // Desktop: honor the container-width control and alignment.
+    stage.style.width="";
+    stage.style.maxWidth=S.cw+"px";
+    stage.style.margin=S.align==="center"?"0 auto":S.align==="right"?"0 0 0 auto":"0";
+  }
+
+  const info=$("deviceInfo");
+  if(info) info.textContent=`${dev.label} · ${dev.w||S.cw}px`;
 
   const cssVars=Object.entries(computeVars()).map(([k,v])=>`${k}:${v}`).join(";");
 
@@ -345,6 +370,28 @@ function wire(){
   });
 }
 
+// ---- Device switcher & mobile menu ----
+function wireDevices(){
+  document.querySelectorAll("#devices button").forEach(b=>{
+    b.addEventListener("click",()=>{
+      S.device=b.dataset.d;
+      document.querySelectorAll("#devices button").forEach(x=>x.classList.remove("on"));
+      b.classList.add("on");
+      render();
+    });
+  });
+
+  const sidebar=$("sidebar"), backdrop=$("backdrop"), toggle=$("menuToggle");
+  const closeMenu=()=>{sidebar.classList.remove("open"); backdrop.classList.remove("show");};
+  if(toggle){
+    toggle.addEventListener("click",()=>{
+      const open=sidebar.classList.toggle("open");
+      backdrop.classList.toggle("show",open);
+    });
+    backdrop.addEventListener("click",closeMenu);
+  }
+}
+
 // ---- Export ----
 let expFmt="json";
 
@@ -443,7 +490,7 @@ function wireExport(){
 }
 
 // ---- Init ----
-buildPalettes(); buildFonts(); wire(); wireExport();
+buildPalettes(); buildFonts(); wire(); wireExport(); wireDevices();
 Object.assign(S,PALETTES[0]);
 syncUI(); render();
 updateExportPreview();
